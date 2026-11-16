@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Blender shrine scene: fast-track plan</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f3ee;--card:#fff;--text:#231f1c;--muted:#6b625b;--line:#e2dbd2;--accent:#b3261e;--accent2:#e8c9c6;--ok:#2e7d4f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15110f;--card:#201a17;--text:#f0e9e2;--muted:#a69a90;--line:#352c27;--accent:#e0584d;--accent2:#4a2420;--ok:#5fc287}}
+:root[data-theme="dark"]{--bg:#15110f;--card:#201a17;--text:#f0e9e2;--muted:#a69a90;--line:#352c27;--accent:#e0584d;--accent2:#4a2420;--ok:#5fc287}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:820px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.7rem;margin:.2em 0}
+.sub{color:var(--muted);margin:0 0 16px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:10px 0;z-index:5;border-bottom:1px solid var(--line)}
+.bar{height:12px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:6px;font-size:.9rem;color:var(--muted)}
+button{font:inherit;background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:4px 10px;cursor:pointer}
+.note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;margin:16px 0;font-size:.95rem}
+.note ul{margin:6px 0 0;padding-left:20px}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:12px 0}
+summary{cursor:pointer;padding:14px;list-style:none;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+summary::-webkit-details-marker{display:none}
+summary b{flex:1;min-width:180px}
+.time{font-size:.8rem;color:var(--muted)}
+.pill{font-size:.78rem;border-radius:99px;padding:2px 9px;background:var(--accent2);color:var(--text)}
+.pill.done{background:var(--ok);color:#fff}
+.body{padding:0 14px 14px}
+.goal{color:var(--muted);margin:0 0 8px;font-size:.92rem}
+label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+input[type=checkbox]{width:19px;height:19px;margin-top:3px;accent-color:var(--accent);flex:none}
+label.on span{color:var(--muted);text-decoration:line-through}
+.deliv{margin-top:10px;padding:8px 12px;border-radius:8px;background:var(--accent2);font-size:.92rem}
+.links{margin-top:10px;font-size:.9rem}
+.links a{color:var(--accent);margin-right:12px;white-space:nowrap}
+.res{margin-top:12px}.res ul{margin:6px 0 0;padding-left:18px}.res li{margin:9px 0}.res a{color:var(--accent);font-weight:600}.res span{color:var(--muted);font-size:.9rem}
+.cut{font-size:.9rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>Dark-fantasy shrine: fast-track plan</h1>
+<p class="sub">You already have the models and textures, so this skips modelling from scratch. Target: top-left wide shot first.</p>
+<div class="top">
+  <div class="bar"><i id="fill"></i></div>
+  <div class="row"><span id="count">0 / 0 tasks</span><button id="reset">Reset all</button></div>
+</div>
+<div class="note"><b>Realistic timeline at 8–10 h/week</b>
+<ul>
+<li><b>Simple scene (Phases 0–3):</b> about 2–3 weeks, even with little Blender experience.</li>
+<li><b>Reference-quality still (Phases 4–9):</b> another 4–6 weeks. Optional A–D come on top.</li>
+<li>Already comfortable in Blender? Halve these numbers.</li>
+</ul></div>
+<div id="plan"></div>
+<p class="cut"><b>If you fall behind, cut in this order:</b> extra camera angles, background detail, rig polish. Never cut materials or lighting; they create the reference look.</p>
+</main>
+<script>
+var P=[
+{t:"Phase 0 · Setup",time:"1 day",goal:"Get organised so nothing breaks later.",
+tasks:["Install the latest stable Blender","Install PureRef and drop in the reference image","Create folders: /originals and /cleaned for your models and textures","Check licenses of any downloaded assets","Pick the one camera shot to hit first: top-left wide shot"],
+d:"Empty project folder and a reference board.",
+l:[["Blender download","https://www.blender.org/download/"],["PureRef","https://www.pureref.com/"]]},
+{t:"Phase 1 · Blender essentials (skip what you know)",time:"3–5 days",goal:"Only the skills you need to assemble a scene.",
+tasks:["Navigate viewport, select, move, rotate, scale","Understand object origin, apply scale, and Collections","Learn Edit Mode basics: extrude, loop cut, bevel","Learn Shader Editor basics and the Principled BSDF","Render a test image in EEVEE and in Cycles"],
+d:"One simple object rendered with a material.",
+l:[["Blender Fundamentals (Blender Studio)","https://studio.blender.org/training/blender-fundamentals/"],["Blender manual","https://docs.blender.org/manual/en/latest/"],["Donut tutorial (Blender Guru)","https://www.youtube.com/results?search_query=blender+guru+donut+tutorial"]]},
+{t:"Phase 2 · Import and clean your assets",time:"3–5 days",goal:"Make the samurai, spider, torii, rocks and trees behave in one scene.",
+tasks:["Import every model (GLB/FBX/OBJ) into one master .blend","Set real-world scale: samurai about 1.8 m, torii about 5 m, spider relative to samurai","Apply transforms and set origins at the base of each object","Merge by Distance, delete loose geometry, recalculate normals","Check polygon counts; Decimate heavy meshes (rocks, trees, torii)","Name objects and sort into collections: Architecture, Terrain, Vegetation, Characters, Lighting","Save cleaned versions separately from the originals"],
+d:"All assets in one file, correct scale, grey and tidy.",
+l:[["Mesh cleanup docs","https://docs.blender.org/manual/en/latest/modeling/meshes/editing/mesh/cleanup.html"],["Decimate modifier","https://docs.blender.org/manual/en/latest/modeling/modifiers/generate/decimate.html"],["Cleaning AI models (YouTube)","https://www.youtube.com/results?search_query=blender+clean+up+ai+generated+3d+model"]]},
+{t:"Phase 3 · Simple scene (Milestone 1)",time:"3–5 days",goal:"Block out the composition fast, before any polish.",
+tasks:["Make a ground plane and sculpt a rough path and slopes","Place the torii and build or place a stone staircase","Place two stone lanterns","Place the samurai and spider with feet touching the ground","Place 5–6 rocks and 2–3 trees around the frame","Set a camera matching the top-left reference (about 35 mm, low angle)","Add a simple sun and world light","Render a first still","Compare against the reference and write down 5 differences"],
+d:"MILESTONE 1: a rough but complete scene rendered from the hero camera.",
+l:[["Sculpting basics (YouTube)","https://www.youtube.com/results?search_query=blender+sculpting+terrain+beginner"],["Poly Haven models","https://polyhaven.com/models"]]},
+{t:"Phase 4 · Materials and textures",time:"1–2 weeks",goal:"Make everything belong to the same world.",
+tasks:["UV-check each model and fix stretched or overlapping UVs","Plug your texture maps in: albedo, roughness, normal (set Non-Color for data maps)","Torii: faded red paint over weathered wood, with edge wear","Stone: lanterns, stairs and rocks with moss in the crevices","Ground: soil, mud, leaves, damp patches","Samurai: separate metal, leather and cloth materials","Spider: dark chitin, red wrapping, metallic highlights","Trees: bark and red maple leaves with alpha","Unify colours: muted green-grey with red accents"],
+d:"MILESTONE 2: all assets textured and consistent in one render.",
+l:[["Poly Haven textures","https://polyhaven.com/textures"],["ambientCG","https://ambientcg.com/"],["Procedural weathered wood","https://www.youtube.com/results?search_query=blender+procedural+weathered+wood+material"],["Moss material","https://www.youtube.com/results?search_query=blender+moss+material+geometry+nodes"],["Texture painting","https://www.youtube.com/results?search_query=blender+texture+painting+beginner"]]},
+{t:"Phase 5 · Vegetation and set dressing",time:"1–2 weeks",goal:"Fill the scene using scattering, not hand placement.",
+tasks:["Learn Geometry Nodes: Distribute Points on Faces, Instance on Points, Random Value","Scatter grass and ferns with a density mask","Scatter moss clumps and small pebbles near rocks and stairs","Scatter red fallen leaves on the path and ground","Add background tree line and a pagoda silhouette in the mist","Add roots over the path and small branches","Hide anything outside the camera view to save time"],
+d:"MILESTONE 3: a dense, natural environment around the shrine.",
+l:[["Geometry Nodes from Scratch","https://studio.blender.org/training/geometry-nodes-from-scratch/"],["Sapling Tree Gen (built in)","https://docs.blender.org/manual/en/latest/addons/add_curve/sapling_tree_gen.html"],["Foliage scattering (YouTube)","https://www.youtube.com/results?search_query=blender+geometry+nodes+scatter+foliage+forest"]]},
+{t:"Phase 6 · Lighting, atmosphere and camera",time:"1 week",goal:"This is what turns a render into the reference look.",
+tasks:["Add an overcast HDRI plus a soft warm sun","Add volumetric fog and depth haze toward the background","Add emissive glow and small point lights in the lanterns","Set focal length, camera height and depth of field","Compose with rule of thirds and the stairs as a leading line","Test Cycles samples and enable the denoiser","Do a low-res lighting pass and compare to the reference"],
+d:"MILESTONE 4: the atmosphere and composition match the reference.",
+l:[["Cinematic lighting","https://www.youtube.com/results?search_query=blender+cinematic+environment+lighting"],["Volumetric fog","https://www.youtube.com/results?search_query=blender+volumetric+fog+tutorial"],["Camera composition","https://www.youtube.com/results?search_query=blender+camera+composition+tutorial"],["Poly Haven HDRIs","https://polyhaven.com/hdris"]]},
+{t:"Phase 7 · Final render and grade",time:"2–4 days",goal:"Finish the hero shot.",
+tasks:["Render at full resolution in Cycles with denoising","Colour grade in the Compositor: contrast, warm highlights, slight desaturation","Add glare, vignette and subtle film grain","Final touch-ups in Krita or GIMP","Export PNG and save the .blend"],
+d:"FINAL: the top-left wide shot.",
+l:[["Compositor docs","https://docs.blender.org/manual/en/latest/compositing/index.html"],["Krita","https://krita.org/"],["GIMP","https://www.gimp.org/"]]},
+{t:"Phase 8 · Optional upgrades",time:"Any time",goal:"Only after the hero shot is done.",
+tasks:["Render the close-up spider shot","Render the high-angle shot","Improve character poses and ground contact","Retopologise and rig the samurai or spider","Animate leaves, fog, lantern flicker and a slow camera move"],
+d:"Bonus shots and optional animation.",
+l:[["Rigify tutorials","https://www.youtube.com/results?search_query=blender+rigify+beginner+tutorial"],["Retopology docs","https://docs.blender.org/manual/en/latest/modeling/meshes/retopology.html"]]},
+{t:"Optional A · Japanese architecture from scratch",time:"1–2 weeks",goal:"Rebuild or upgrade the torii, lanterns, stairs and pagoda as clean modular game pieces. Do any time after the simple scene.",
+tasks:["Collect real photos in PureRef: torii, stone lanterns, shrine roofs, stone stairs","Learn the parts of a torii: two pillars, kasagi (top beam), shimaki, nuki (lower beam), base stones","Model the torii as separate modular pieces with Bevel and Array modifiers","Model a stone lantern in parts: base, shaft, light box, roof, finial","Make stone stairs with an Array modifier, then add chips, wear and slight random offsets","Model a simple pagoda or shrine hall: base, pillars, tiered curved roofs","Make roof tiles and wood beams reusable instead of one large mesh","UV unwrap each piece and apply your textures"],
+d:"A modular Japanese architecture kit ready for your game."},
+{t:"Optional B · Modular samurai from your references",time:"3–5 weeks",goal:"Build a customisable character: every armour piece, clothing item, mask and weapon is its own object.",
+tasks:["Set up front, side and back reference images from your samurai picture","Write the parts list: base body, mask, helmet, chest armour, shoulder guards, arm guards, skirt plates, sash, trousers, boots, katana and sheath","Block out the base body, or generate one with a free human base mesh tool","Model each armour and clothing piece as a separate object over the body","Use mirror and shrinkwrap workflows so pieces fit the body","Sculpt detail on a high-poly version of each hero piece","Retopologise each piece to game-ready low poly and bake normal maps","Unwrap UVs per part and name everything consistently","Texture each part with its own material","Rig with Rigify, then transfer weights so armour follows the body","Test swapping parts, then export a test to your game engine"],
+d:"A samurai with swappable, individually textured parts."},
+{t:"Optional C · Modular spider from your references",time:"3–5 weeks",goal:"Build the spider as separate parts so legs, armour plates, bindings and details can be changed individually.",
+tasks:["Set up top, side and front reference images from your spider picture","Write the parts list: abdomen, head section, fangs, eyes, 8 legs, armour plates, spikes, red bindings","Model one leg with 3–4 segments and claw, then duplicate it for all eight","Model the abdomen with its web-like plate pattern as a separate piece","Create the red bindings with curves converted to meshes","Add armour plates and spikes as separate swappable objects","Sculpt chitin detail, then retopologise and bake normal maps","Unwrap UVs per part and name everything consistently","Rig with IK legs and test a walking or idle pose","Export parts to your game engine and test swapping"],
+d:"A spider with modular legs, plates and bindings."},
+{t:"Recommended · Improve your AI models",time:"3–5 days",goal:"Raise quality without needing a strong GPU. Do after materials, before vegetation.",
+tasks:["List which models appear in the hero shot and prioritise only those","Check your re-textured models up close and fix weak areas","Upscale blurry textures with a free upscaler such as Upscayl","Delete hidden or internal geometry you never see","Sculpt over lumpy spots with Smooth, Flatten and Crease brushes","Make a simplified copy with Decimate or Voxel Remesh","Bake the detail from the dense mesh onto a normal map for the simple copy","Rebuild simple pieces (torii, lanterns, stairs) cleanly instead of fixing them","Set a texture size budget: 2K for hero assets, 1K for background","Optional: regenerate weak models on a free cloud image-to-3D service from clean multi-angle images, and check the licence"],
+d:"Cleaner, better-looking models that stay light enough for your PC."},
+{t:"Recommended · Split the samurai and spider into parts",time:"1–2 weeks",goal:"Turn single-mesh models into separate parts so you can customise, swap and rotate them in your game. Do after the simple scene is done.",
+tasks:["Samurai: split loose pieces (katana, sheath, sash) with Separate > By Loose Parts","Samurai: select fused parts (mask, helmet, armour plates) with Lasso or Select Linked and separate them","Fill open edges with F, or use Extrude and a Solidify modifier to give each plate thickness","Fill the body under removable parts (for example the head under the mask)","Spider: separate the abdomen, head, fangs and eyes","Spider: separate each leg, then each leg segment (one object per joint)","Name every part consistently, such as samurai_mask and spider_leg_L1_seg2","Set each origin at its pivot using the 3D cursor: grip, mask hinge, shoulder, each leg joint","Confirm each part keeps its material and UVs","Parent parts: weapon to hand bone or socket, armour to body bones, mask to head bone","Test rotating and swapping every part, then test import into your game engine","If a cut looks messy, rebuild that part cleanly (see Optional B and C)"],
+d:"Samurai and spider with separate, rotatable, customisable parts."}
+];
+var U=[
+[["Blender download","https://www.blender.org/download/","Install the latest stable release (not a beta) so tutorials and menus match."],
+["PureRef","https://www.pureref.com/","Keep your reference image and real torii, lantern and moss photos open beside Blender."],
+["Poly Haven","https://polyhaven.com/","Check the CC0 licence on every texture, HDRI and model you download; no credit needed."]],
+[["Blender Fundamentals (Blender Studio)","https://studio.blender.org/training/blender-fundamentals/","Do this first. Official free course for navigation, objects, edit mode, materials, lighting and a first render."],
+["Blender Guru: Beginner Donut Tutorial (latest version)","https://www.blenderguru.com/posts","Pick this if you want a guided project. Watch the interface and modelling parts, the shading part for materials, and the lighting, compositing and rendering parts for your final steps."],
+["Blender Guru: 10 Easy Ways to Render Faster","yt:Blender Guru 10 Easy Ways to Render Faster in Blender","Watch once before your first Cycles render so test renders stay quick."],
+["Blender manual","https://docs.blender.org/manual/en/latest/","Look things up only when stuck; do not read it front to back."]],
+[["Mesh cleanup docs","https://docs.blender.org/manual/en/latest/modeling/meshes/editing/mesh/cleanup.html","Reference for Merge by Distance, loose geometry, filling holes and normals."],
+["Decimate modifier docs","https://docs.blender.org/manual/en/latest/modeling/modifiers/generate/decimate.html","Reduce polygon counts on heavy rocks, trees and the torii without remodelling."],
+["Import, scale and origin tutorial","yt:blender import glb fbx fix scale apply transforms set origin","Fix wrong scale and pivots so your samurai, spider and torii share real-world proportions."],
+["Cleaning AI-generated models","yt:blender clean up ai generated 3d model","See how others fix messy topology, loose pieces and flipped normals on generated meshes."],
+["Retopology docs","https://docs.blender.org/manual/en/latest/modeling/meshes/retopology.html","Only if a model will be animated or deforms badly; static poses can skip this."]],
+[["Environment blockout tutorial","yt:blender environment blockout composition beginner","Learn to place big shapes and set the composition before polishing anything."],
+["Beginner terrain sculpting (Grant Abbitt)","yt:Grant Abbitt blender sculpting beginner","Use for the ground, slopes and the path; learn Grab, Clay Strips and Smooth brushes."],
+["Snap objects to ground","yt:blender place objects on ground snap to face drop to floor","Get the spider’s legs and the samurai’s feet touching the terrain."],
+["Cameras docs","https://docs.blender.org/manual/en/latest/render/cameras.html","Focal length, sensor and depth of field settings for the hero camera."],
+["Poly Haven models","https://polyhaven.com/models","Free filler rocks and props if your own set looks thin."],
+["Torii parts and proportions (Wikipedia)","https://en.wikipedia.org/wiki/Torii","Learn the real names and layout of the gate parts so your torii looks authentic."],
+["Shinto shrine layout (Wikipedia)","https://en.wikipedia.org/wiki/Shinto_shrine","Understand how gate, stairs, lanterns and halls are arranged along the approach."],
+["Japanese architecture in Blender","yt:blender japanese architecture modeling tutorial","Overview tutorials for shrine and temple buildings to guide your blockout."]],
+[["Blender Guru: How to Texture in Blender (Full Course)","yt:Blender Guru How to Texture in Blender Full Course","Your main resource for this phase: UV unwrapping, and wiring colour, roughness and normal maps into the Principled BSDF using the maps you already downloaded."],
+["Principled BSDF docs","https://docs.blender.org/manual/en/latest/render/shader_nodes/shader/principled.html","Quick reference for what each slot does (roughness, metallic, normal, emission)."],
+["Erindale (shader nodes)","yt:Erindale blender shader nodes procedural","Learn masks from ambient occlusion and curvature for edge wear and moss in crevices."],
+["Weathered wood and paint","yt:blender procedural weathered wood peeling red paint material","For the faded red lacquer over bare wood on the torii."],
+["Moss material","yt:blender moss material geometry nodes","For mossy stone, lanterns and rocks."],
+["Texture painting","yt:blender texture painting beginner","Hand-paint dirt, wear and colour variation that procedural masks miss."],
+["Poly Haven textures / ambientCG","https://ambientcg.com/","Extra free PBR sets for mud, leaves, cracked stone and bark when yours fall short."]],
+[["Geometry Nodes from Scratch (Blender Studio)","https://studio.blender.org/training/geometry-nodes-from-scratch/","Your main resource: do the rock-scattering examples first, then the tree example if needed."],
+["Blender Guru: Geometry Nodes for Beginners","yt:Blender Guru Geometry Nodes for Beginners","Gentler first look at nodes if the Studio course feels fast."],
+["Joey Carlino (Geometry Nodes)","yt:Joey Carlino geometry nodes scatter","Scatter with density masks and vertex groups for grass, ferns, leaves and pebbles."],
+["Foliage and forest scattering","yt:blender geometry nodes scatter foliage forest","See complete scatter setups for grass, ground cover and tree lines."],
+["Sapling Tree Gen docs","https://docs.blender.org/manual/en/latest/addons/add_curve/sapling_tree_gen.html","Only if you want extra maples or background trees beyond the ones you already have."]],
+[["Cinematic environment lighting","yt:blender cinematic environment lighting tutorial","Combine an HDRI with a soft sun and fill for the overcast but warm look."],
+["Volumetric fog","yt:blender volumetric fog tutorial","Mist between trees, light rays and depth haze toward the background."],
+["Emissive lantern glow","yt:blender emission glowing lantern light","Warm lantern windows plus small point lights."],
+["Camera composition","yt:blender camera composition tutorial","Rule of thirds, leading lines, focal length and depth of field for the hero shot."],
+["Poly Haven HDRIs","https://polyhaven.com/hdris","Pick a cloudy, soft sky to start from."]],
+[["Blender Guru Donut tutorial: compositing and rendering parts","https://www.blenderguru.com/posts","Quick intro to glare, colour tweaks and final render settings."],
+["Compositor color grading","yt:blender compositor cinematic color grading tutorial","Contrast, warm highlights, slight desaturation, vignette and grain."],
+["Cycles sampling docs","https://docs.blender.org/manual/en/latest/render/cycles/render_settings/sampling.html","Sample counts and denoising for a clean final image."],
+["Krita","https://krita.org/","Free final touch-ups after export."]],
+[["Rigify beginner tutorial","yt:blender rigify beginner tutorial","Fast rig for posing or animating the samurai."],
+["Spider rig and IK legs","yt:blender spider rig inverse kinematics legs","Pose or animate eight legs with IK."],
+["Falling leaves and wind","yt:blender falling leaves wind animation","Subtle motion that makes the scene feel alive."],
+["Retopology docs","https://docs.blender.org/manual/en/latest/modeling/meshes/retopology.html","Clean meshes for better deformation if you animate."]],
+[["Torii gate tutorial","yt:blender torii gate modeling tutorial","Follow the main structure, then rebuild it as separate pillars and beams."],
+["Stone lantern tutorial","yt:blender japanese stone lantern toro modeling tutorial","Model the five lantern sections and their carved details."],
+["Japanese temple roof","yt:blender japanese temple roof modeling tutorial curved","Curved eaves, rafters and tile rows."],
+["Pagoda tutorial","yt:blender pagoda modeling tutorial","Stacked roof tiers for your background pagoda."],
+["Stone stairs","yt:blender stone stairs array modifier tutorial","Fast stairs with natural variation."],
+["Bevel and Array docs","https://docs.blender.org/manual/en/latest/modeling/modifiers/generate/array.html","Reference for the two modifiers used most in architecture."]],
+[["Reference images in Blender","yt:blender set up reference images front side back character modeling","Align your images so proportions are accurate."],
+["Character modeling from reference","yt:blender character modeling beginner from reference images","Build the base body and proportions."],
+["Samurai armour modeling","yt:blender samurai armor modeling tutorial","Chest plates, shoulder guards and layered lamellar pieces."],
+["Hard-surface armour","yt:blender hard surface armor modeling tutorial","Clean armour shapes with bevels and booleans."],
+["Modular characters for games","yt:blender modular character game customization","Split gear into swappable pieces."],
+["Retopology and baking","yt:blender high poly to low poly normal map baking tutorial","Detailed look on a low-poly mesh."],
+["Weight transfer for clothing and armour","yt:blender data transfer weights armor clothing rigify","Make armour follow the body when posed."],
+["Shrinkwrap docs","https://docs.blender.org/manual/en/latest/modeling/modifiers/deform/shrinkwrap.html","Fit armour and clothing to the body."],
+["Baking docs","https://docs.blender.org/manual/en/latest/render/cycles/baking.html","Reference for normal map baking settings."],
+["Rigify docs","https://docs.blender.org/manual/en/latest/addons/rigging/rigify/index.html","Reference for the automatic human rig."]],
+[["Spider modeling tutorial","yt:blender spider modeling tutorial","Leg segments, body and head structure."],
+["Spider rig with IK legs","yt:blender spider rig inverse kinematics legs","Pose and animate all eight legs."],
+["Rope and binding wraps","yt:blender curve bevel rope wrapping tutorial","Create the red bindings wrapped around the legs."],
+["Creature armour plates","yt:blender creature armor plates modeling","Separate plates and spikes over a creature body."],
+["Mirror modifier docs","https://docs.blender.org/manual/en/latest/modeling/modifiers/generate/mirror.html","Model one half of the body and mirror it."],
+["Baking docs","https://docs.blender.org/manual/en/latest/render/cycles/baking.html","Bake sculpted detail onto low-poly parts."]],
+[["Upscayl","https://upscayl.org/","Free upscaler to sharpen blurry AI textures before using them."],
+["Fixing AI model textures","yt:blender fix ai generated 3d model texture retexture pbr","See how to replace flat AI colour with proper PBR materials."],
+["Bake high poly to low poly","yt:blender bake high poly details onto low poly normal map","Keep close-up detail on a lighter mesh, ideal for a weaker GPU."],
+["Baking docs","https://docs.blender.org/manual/en/latest/render/cycles/baking.html","Reference for normal map baking settings."],
+["Decimate docs","https://docs.blender.org/manual/en/latest/modeling/modifiers/generate/decimate.html","Reduce polygon counts quickly."],
+["Sculpt mode docs","https://docs.blender.org/manual/en/latest/sculpt_paint/sculpting/index.html","Smooth, Flatten and Crease brushes to repair lumpy surfaces."],
+["Blender Guru: How to Texture in Blender (Full Course)","yt:Blender Guru How to Texture in Blender Full Course","Apply your downloaded PBR maps correctly."]],
+[["Separate by loose parts","yt:blender separate mesh by loose parts split into objects","Split weapons and other disconnected pieces in one step."],
+["Split fused AI mesh into parts","yt:blender separate part of mesh fill holes solidify","Cut armour and masks out of a single mesh and close the openings."],
+["Solidify docs","https://docs.blender.org/manual/en/latest/modeling/modifiers/generate/solidify.html","Give thin separated plates real thickness."],
+["Set origin to 3D cursor","yt:blender set origin to 3d cursor pivot point rotate object","Make parts rotate around the grip, hinge or joint."],
+["Parent weapons and armour to bones","yt:blender parent object to bone weapon socket character","Attach swappable gear to a hand, body or head bone."],
+["Spider leg rig with IK","yt:blender spider rig inverse kinematics legs","Bend all eight legs from their joints."],
+["Rigify docs","https://docs.blender.org/manual/en/latest/addons/rigging/rigify/index.html","Reference for the automatic human rig on the samurai."]]
+];
+var ORDER=[0,1,2,3,13,4,12,5,6,7,9,10,11,8],DET={},T=["Phase 0 · Setup","Phase 1 · Blender essentials (skip what you know)","Phase 2 · Import and clean your assets","Phase 3 · Simple scene (Milestone 1)","Phase 4 · Split the samurai and spider into parts","Phase 5 · Materials and textures","Phase 6 · Improve your AI models (sculpt and bake)","Phase 7 · Vegetation and set dressing","Phase 8 · Lighting, atmosphere and camera","Phase 9 · Final render and grade","Optional A · Japanese architecture from scratch","Optional B · Modular samurai from your references","Optional C · Modular spider from your references","Optional D · Animation and bonus shots"];
+var KEY="blender-shrine-plan-v1",S={};
+try{S=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){S={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+var plan=document.getElementById("plan");
+P.forEach(function(p,i){
+ var det=document.createElement("details");det.id="p"+i;if(ORDER.indexOf(i)<2)det.open=true;
+ var h="<summary><b>"+T[ORDER.indexOf(i)]+"</b><span class='time'>"+p.time+"</span><span class='pill' id='pc"+i+"'></span></summary><div class='body'><p class='goal'>"+p.goal+"</p>";
+ p.tasks.forEach(function(t,j){h+="<label><input type='checkbox' data-k='"+i+"-"+j+"'><span>"+t+"</span></label>"});
+ h+="<div class='deliv'><b>Deliverable:</b> "+p.d+"</div><div class='res'><b>Which resource to use, and for what</b><ul>"+U[i].map(function(x){var u=x[1].indexOf("yt:")===0?"https://www.youtube.com/results?search_query="+encodeURIComponent(x[1].slice(3)):x[1];return "<li><a href='"+u+"' target='_blank' rel='noopener'>"+x[0]+" ↗</a><br><span>"+x[2]+"</span></li>"}).join("")+"</ul></div></div>";
+ det.innerHTML=h;DET[i]=det;
+});
+ORDER.forEach(function(i){plan.appendChild(DET[i])});
+function update(){
+ var tot=0,done=0;
+ P.forEach(function(p,i){
+  var d=0;
+  p.tasks.forEach(function(t,j){if(S[i+"-"+j])d++});
+  tot+=p.tasks.length;done+=d;
+  var pc=document.getElementById("pc"+i);
+  pc.textContent=d+"/"+p.tasks.length;
+  pc.className="pill"+(d===p.tasks.length?" done":"");
+ });
+ document.getElementById("fill").style.width=(done/tot*100)+"%";
+ document.getElementById("count").textContent=done+" / "+tot+" tasks ("+Math.round(done/tot*100)+"%)";
+}
+document.querySelectorAll("input[data-k]").forEach(function(c){
+ var k=c.dataset.k;c.checked=!!S[k];c.parentNode.classList.toggle("on",c.checked);
+ c.addEventListener("change",function(){
+  if(c.checked)S[k]=1;else delete S[k];
+  c.parentNode.classList.toggle("on",c.checked);save();update();
+ });
+});
+document.getElementById("reset").onclick=function(){
+ if(!confirm("Clear all progress?"))return;
+ S={};save();
+ document.querySelectorAll("input[data-k]").forEach(function(c){c.checked=false;c.parentNode.classList.remove("on")});
+ update();
+};
+update();
+</script>
+</body>
+</html>
